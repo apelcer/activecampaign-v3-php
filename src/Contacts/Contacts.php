@@ -79,7 +79,7 @@ class Contacts extends Resource
     {
         $req = $this->client
             ->getClient()
-            ->post('', [
+            ->post('/api/3/contactLists', [
                 'json' => [
                     'contactList' => $contact_list
                 ]
@@ -155,8 +155,10 @@ class Contacts extends Resource
             ->getClient()
             ->post('/api/3/contactTags', [
                 'json' => [
-                    'contact' => $id,
-                    'tag' => $tag_id
+                    'contactTag' => [
+                        'contact' => $id,
+                        'tag' => $tag_id
+                    ]
                 ]
             ]);
 
@@ -202,6 +204,123 @@ class Contacts extends Resource
             ]);
 
         return $req->getBody()->getContents();
+    }
+
+    /**
+     * List all custom fields
+     * @see https://developers.activecampaign.com/v3/reference#retrieve-fields-1
+     * @param array $query_params
+     * @return string
+     */
+    public function listAllCustomFields(array $query_params = [])
+    {
+        $req = $this->client
+            ->getClient()
+            ->get('/api/3/fields', [
+                'query' => $query_params
+            ]);
+
+        return $req->getBody()->getContents();
+    }
+
+    /**
+     * Create a custom field value
+     * @see https://developers.activecampaign.com/v3/reference#create-fieldvalue
+     *
+     * @param int $contact_id
+     * @param int $field_id
+     * @param string $field_value
+     * @return string
+     */
+    public function createCustomFieldValue(int $contact_id, int $field_id, string $field_value)
+    {
+        $req = $this->client
+            ->getClient()
+            ->post('/api/3/fieldValues', [
+                'json' => [
+                    'fieldValue' => [
+                        'contact' => $contact_id,
+                        'field' => $field_id,
+                        'value' => $field_value
+                    ]
+                ]
+            ]);
+
+        return $req->getBody()->getContents();
+    }
+
+    /**
+     * Retrieve a custom field value
+     * @see https://developers.activecampaign.com/v3/reference#retrieve-a-fieldvalues
+     *
+     * @param int $field_id
+     * @return string
+     */
+    public function retrieveCustomFieldValue(int $field_id)
+    {
+        $req = $this->client
+            ->getClient()
+            ->get('/api/3/fieldValues/' . $field_id);
+
+        return $req->getBody()->getContents();
+    }
+
+    /**
+     * Update a custom field value
+     * @see https://developers.activecampaign.com/v3/reference#update-a-custom-field-value-for-contact
+     *
+     * @param int $field_value_id
+     * @param int $contact_id
+     * @param int $field_id
+     * @param string $field_value
+     * @return string
+     */
+    public function updateCustomFieldValue(int $field_value_id, int $contact_id, int $field_id, string $field_value)
+    {
+        $req = $this->client
+            ->getClient()
+            ->put('/api/3/fieldValues/' . $field_value_id, [
+                'json' => [
+                    'fieldValue' => [
+                        'contact' => $contact_id,
+                        'field' => $field_id,
+                        'value' => $field_value
+                    ]
+                ]
+            ]);
+
+        return $req->getBody()->getContents();
+    }
+
+    /**
+     * Delete a custom field value
+     * @see https://developers.activecampaign.com/v3/reference#delete-a-fieldvalue-1
+     *
+     * @param int $field_value_id
+     * @return bool
+     */
+    public function deleteCustomFieldValue(int $field_value_id)
+    {
+        $req = $this->client
+            ->getClient()
+            ->delete('/api/3/fieldValues/' . $field_value_id);
+
+        return 200 === $req->getStatusCode();
+    }
+
+    /**
+     * Remove contact from automation
+     * @see https://developers.activecampaign.com/reference#delete-a-contactautomation
+     * @param int $contactAutomationId
+     * @return bool
+     */
+    public function removeAutomation(int $contactAutomationId)
+    {
+        $req = $this->client
+            ->getClient()
+            ->delete('/api/3/contactAutomation/' . $contactAutomationId);
+
+        return 200 === $req->getStatusCode();
     }
 
 }
